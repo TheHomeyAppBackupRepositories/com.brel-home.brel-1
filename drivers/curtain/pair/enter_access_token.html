@@ -1,0 +1,38 @@
+<h2>Please enter the access token:</h2>
+
+<ul>
+    <li>Open the Brel-Home app</li>
+    <li>Go to the profile page</li>
+    <li>Press the gray area to the right of the profile picture 5 times</li>
+    <li>Use the "copy" button to copy the access token</li>
+    <li>Paste the access token here</li>
+</ul>
+
+<form id="form">
+    <input id="token"
+           type="text"
+           required
+           placeholder="Enter access token here">
+
+    <button id="button">
+        Submit
+    </button>
+</form>
+
+<script type="application/javascript">
+// TODO: translate
+Homey.setTitle('Please enter the Brel-Home access token');
+
+document.getElementById('form').onsubmit = (ev) => {
+    ev.preventDefault();
+    var token = document.getElementById('token').value;
+    Homey.emit('access_token_entered', { token });
+    Homey.nextView();
+};
+</script>
+
+<style>
+    #button {
+        margin-top: 4px;
+    }
+</style>
