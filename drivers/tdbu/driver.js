@@ -19,6 +19,9 @@ class TDBUDriver extends BaseDriver_1.default {
             return args.device.triggerCapabilityListener("brel_bottom_position" /* Capability.Bottom */, args.position, {});
         });
     }
+    getDeviceType() {
+        return "10000001" /* DeviceType.TopDownBottomUp */;
+    }
     getMotorType() {
         return 9 /* MotorType.TDBU */;
     }
