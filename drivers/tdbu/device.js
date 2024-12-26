@@ -24,39 +24,37 @@ class TDBUDevice extends BaseDevice_1.default {
         if (!report.data) {
             return;
         }
-        if (report.data.targetPosition_T) {
-            const topPercentage = this.mdriver.positionToPercentageOpen(report.data.targetPosition_T);
-            await this.setCapabilityValue("brel_top_position" /* Capability.Top */, topPercentage);
+        if (report.data.currentPosition_T) {
+            await this.setCapabilityValue("brel_top_position" /* Capability.Top */, report.data.currentPosition_T);
         }
-        if (report.data.targetPosition_B) {
-            const bottomPercentage = this.mdriver.positionToPercentageOpen(report.data.targetPosition_B);
-            await this.setCapabilityValue("brel_bottom_position" /* Capability.Bottom */, bottomPercentage);
+        if (report.data.currentPosition_B) {
+            await this.setCapabilityValue("brel_bottom_position" /* Capability.Bottom */, report.data.currentPosition_B);
         }
     }
     registerCapabilityListeners() {
         this.registerCapabilityListener("brel_top_position" /* Capability.Top */, async (percentage) => {
-            const bottom = this.getCapabilityValue("brel_bottom_position" /* Capability.Bottom */);
+            let bottom = this.getCapabilityValue("brel_bottom_position" /* Capability.Bottom */);
             // Don't allow top to go below bottom.
-            if (bottom > percentage) {
-                percentage = bottom;
+            if (bottom < percentage) {
+                this.log('SET TOP - CORRECTING', bottom, percentage);
+                bottom = percentage;
             }
             await this.writeTdbuPositions(percentage, bottom);
         });
         this.registerCapabilityListener("brel_bottom_position" /* Capability.Bottom */, async (percentage) => {
-            const top = this.getCapabilityValue("brel_top_position" /* Capability.Top */);
+            let top = this.getCapabilityValue("brel_top_position" /* Capability.Top */);
             // Don't allow bottom to go above top.
             if (top > percentage) {
-                percentage = top;
+                this.log('SET BOTTOM - CORRECTING', top, percentage);
+                top = percentage;
             }
             await this.writeTdbuPositions(top, percentage);
         });
     }
     async writeTdbuPositions(topPercentage, bottomPercentage) {
-        const topPosition = this.mdriver.percentageOpenToPosition(topPercentage);
-        const bottomPosition = this.mdriver.percentageOpenToPosition(bottomPercentage);
         await this.writeToDevice({
-            targetPosition_T: topPosition,
-            targetPosition_B: bottomPosition
+            targetPosition_T: topPercentage,
+            targetPosition_B: bottomPercentage
         });
     }
 }
